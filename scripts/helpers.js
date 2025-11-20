@@ -28,7 +28,18 @@
     garri:"cassava flakes",
     cabbage:"cabbage",
     scallions:"spring onion",
-    coriander:"cilantro"
+    coriander:"cilantro",
+    beans:"black eyed pea",
+    bean:"black eyed pea",
+    "black eyed beans":"black eyed pea",
+    "black eye beans":"black eyed pea",
+    "black eyed pea":"black eyed pea",
+    "black-eyed pea":"black eyed pea",
+    "black-eyed peas":"black eyed pea",
+    "blackeyed pea":"black eyed pea",
+    "blackeyed beans":"black eyed pea",
+    chickpeas:"chickpea",
+    garbanzo:"chickpea"
   };
 
   function normalizeItem(str){
