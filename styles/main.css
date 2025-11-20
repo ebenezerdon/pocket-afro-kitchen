@@ -63,8 +63,17 @@ header, nav, .btn-primary, .btn-secondary, .btn-ghost { position: relative; z-in
 .grid-info{ grid-template-columns:1fr !important; }
 @media (min-width:768px){
   .grid-hero{ grid-template-columns:1.2fr .6fr !important; }
-  .tiles-hero{ grid-template-rows:200px 160px !important; }
+  .tiles-hero{ grid-template-rows:auto auto !important; }
   .grid-info{ grid-template-columns:.8fr 1.2fr !important; }
 }
+/* Pot illustration animation */
+.pot-wiggle{animation:potWiggle 2.4s ease-in-out infinite;transform-origin:50% 85%;}
+@keyframes potWiggle{0%,100%{transform:rotate(0deg) translateY(0)}25%{transform:rotate(-2deg) translateY(.5px)}50%{transform:rotate(2deg) translateY(-1px)}75%{transform:rotate(-1deg) translateY(.5px)}}
+.pot-steam{position:absolute;left:50%;top:-6px;transform:translateX(-50%);width:48%;height:28px;pointer-events:none;}
+.pot-steam .steam-dot{position:absolute;bottom:0;left:50%;width:8px;height:8px;transform:translateX(-50%);border-radius:9999px;background:rgba(161,231,223,.75);box-shadow:0 0 6px rgba(161,231,223,.55);animation:steamRise 2.6s ease-in-out infinite;}
+.pot-steam .steam-dot:nth-child(2){animation-delay:.8s;left:40%;width:7px;height:7px}
+.pot-steam .steam-dot:nth-child(3){animation-delay:1.6s;left:60%;width:6px;height:6px}
+@keyframes steamRise{0%{opacity:0;transform:translate(-50%,0) scale(.9)}15%{opacity:.9}60%{opacity:.7}100%{opacity:0;transform:translate(-50%,-36px) scale(1.2)}}
+@media (prefers-reduced-motion: reduce){.pot-wiggle,.pot-steam .steam-dot{animation:none!important}}
 /* Avoid horizontal overflow */
 body{ overflow-x:hidden; }
