@@ -24,13 +24,17 @@
     <nav class="mx-auto max-w-7xl px-6 py-5 flex items-center justify-between">
       <a href="#" class="flex items-center gap-3 group">
         <img src="assets/logo.svg" alt="Pocket Afro Kitchen" class="h-9 w-9 drop-shadow"/>
-        <span class="text-xl font-extrabold" style="font-family:'Work Sans', sans-serif;">Pocket Afro Kitchen</span>
+        <span class="text-xl font-extrabold hidden sm:inline" style="font-family:'Work Sans', sans-serif;">Pocket Afro Kitchen</span>
       </a>
       <div class="flex items-center gap-3">
-        <a href="#features" class="btn-secondary">How it works</a>
-        <a href="app.html" class="btn-primary bg-[#0E9386] hover:bg-[#0C8277] focus:ring-[#A1E7DF]">Launch app</a>
+        <button id="menu-toggle" class="md:hidden inline-flex items-center justify-center rounded-xl p-2 ring-1 ring-black/5" aria-label="Open menu" aria-expanded="false">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+        <div class="hidden md:flex items-center gap-3">
+          <a href="#features" class="btn-secondary">How it works</a>
+          <a href="app.html" class="btn-primary bg-[#0E9386] hover:bg-[#0C8277] focus:ring-[#A1E7DF]">Launch app</a>
+        </div>
       </div>
-    </nav>
   </header>
 
   <main>
@@ -43,7 +47,7 @@
       </div>
 
       <div class="mx-auto max-w-7xl px-6 pt-10 pb-16">
-        <div class="relative grid gap-6" style="grid-template-columns: 1.2fr .6fr;">
+<div class="relative grid gap-6 grid-hero">
           <div class="card-soft p-8 sm:p-10 relative z-10">
             <div class="mb-5 flex gap-2">
               <span class="badge bg-[#E7FFF5] text-[#0E9386]">Pantry smart</span>
@@ -61,7 +65,7 @@
             </div>
           </div>
 
-          <div class="relative grid gap-6" style="grid-template-rows: 200px 160px;">
+<div class="relative grid gap-6 tiles-hero">
             <div class="card-soft p-6 flex flex-col justify-between">
               <div>
                 <p class="text-sm text-[#64748B]">Today7s inspiration</p>
@@ -85,7 +89,7 @@
         </div>
 
         <!-- Staggered info blocks -->
-        <div class="mt-10 grid gap-6" style="grid-template-columns: .8fr 1.2fr;">
+<div class="mt-10 grid gap-6 grid-info">
           <div class="card-soft p-6 sm:p-8">
             <h3 class="text-xl font-extrabold" style="font-family:'Work Sans', sans-serif;">Build a shopping list automatically</h3>
             <p class="mt-2 text-[#475569]">Pick a recipe and we will subtract what is already in your pantry. The result is a neat, shareable list.</p>
@@ -128,7 +132,7 @@
   </main>
 
   <footer class="border-t border-black/5 mt-10">
-    <div class="mx-auto max-w-7xl px-6 py-10 flex items-center justify-between">
+<div class="mx-auto max-w-7xl px-6 py-10 flex flex-col sm:flex-row items-center justify-between gap-4">
       <p class="text-sm text-[#64748B]">Made for everyday cooks. Built with love.</p>
       <a href="app.html" class="btn-secondary">Open app</a>
     </div>
@@ -136,5 +140,24 @@
   <script src="scripts/helpers.js"></script>
   <script src="scripts/ui.js"></script>
   <script src="scripts/main.js"></script>
+  <script>
+    (function(){
+      var btn = document.getElementById('menu-toggle');
+      var menu = document.getElementById('mobile-menu');
+      if(btn && menu){
+        btn.addEventListener('click', function(){
+          var isHidden = menu.classList.contains('hidden');
+          menu.classList.toggle('hidden');
+          btn.setAttribute('aria-expanded', String(isHidden));
+        });
+      }
+    })();
+  </script>
 </body>
 </html>
+    <div id="mobile-menu" class="md:hidden hidden mx-auto max-w-7xl px-6 pb-4">
+      <div class="mt-2 flex flex-col gap-2">
+        <a href="#features" class="btn-secondary w-full justify-center">How it works</a>
+        <a href="app.html" class="btn-primary bg-[#0E9386] hover:bg-[#0C8277] focus:ring-[#A1E7DF] w-full justify-center">Launch app</a>
+      </div>
+    </div>
