@@ -320,24 +320,28 @@
         window.App.LLM.onProgress(function(info){
           if(!$els.llmBanner || $els.llmBanner.length === 0) return;
           const pct = Math.max(0, Math.min(100, Math.round(((info && typeof info.progress === 'number') ? info.progress : 0) * 100)));
-          const downloading = !!(info && info.downloading);
-          if(downloading && pct < 100){
+          const isActive = pct < 100 && (!window.App.LLM.isReady() || window.App.LLM.loading || window.App.LLM.runtimeLoading);
+          if(isActive){
             $els.llmBanner.removeClass('hidden');
-            $els.llmText.text(info && info.text ? info.text : 'Downloading model…');
+            $els.llmText.text(info && info.text ? info.text : 'Loading AI model…');
             $els.llmPct.text(pct + '%');
             $els.llmBar.css('width', pct + '%');
           } else {
+            // Ensure the banner stays hidden once loading completes or the model is already ready
+            $els.llmPct.text('100%');
+            $els.llmBar.css('width', '100%');
             setTimeout(function(){ $els.llmBanner.addClass('hidden'); }, 150);
           }
         });
-        // Kick off preload; the banner will appear only during actual network download
         if(!window.App.LLM.isReady()){
+          $els.llmBanner.removeClass('hidden');
+          $els.llmText.text('Preparing AI model…');
+          $els.llmPct.text('0%');
+          $els.llmBar.css('width', '0%');
           setTimeout(function(){ window.App.LLM.ensure(); }, 0);
         }
       }
-    }catch(e){
-      // ignore
-    }
+    }catch(e){ /* ignore */ }
   };
 
   window.App.render = function(){

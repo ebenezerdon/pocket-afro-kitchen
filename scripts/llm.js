@@ -23,13 +23,10 @@
     },
     _emitProgress(obj){
       try{
-        // Only keep lastProgress if actively downloading (<100%) to avoid replay after ready or cache-only loads
+        // Only keep lastProgress while actively loading (<100%) to avoid replay after ready
         const p = (obj && typeof obj.progress === 'number') ? obj.progress : 0;
-        const t = (obj && (obj.text || obj.stage)) ? (obj.text || obj.stage) : '';
-        const downloading = /download|fetch|network|transfer/i.test(t) && !/cache/i.test(t);
-        const out = Object.assign({}, obj, { downloading });
-        this.lastProgress = (p < 1 && downloading) ? out : null;
-        for(const fn of this._progressListeners){ try{ fn(out); }catch(e){} }
+        this.lastProgress = (p < 1) ? obj : null;
+        for(const fn of this._progressListeners){ try{ fn(obj); }catch(e){} }
       }catch(_){ }
     },
 
