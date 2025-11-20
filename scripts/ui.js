@@ -36,6 +36,10 @@
     $els.btnCopy = $('#btn-copy-list');
     $els.btnClearList = $('#btn-clear-list');
     $els.suggestions = $('#ingredient-suggestions');
+    $els.llmBanner = $('#llm-loading');
+    $els.llmText = $('#llm-loading-text');
+    $els.llmBar = $('#llm-loading-bar');
+    $els.llmPct = $('#llm-loading-pct');
   }
 
   function load(){
@@ -218,8 +222,25 @@
       if(State.currentRecipe) renderRecipe();
     });
 
-    $els.suggest.on('click', function(){
-      const r = suggestRecipeByCountry();
+    $els.suggest.on('click', async function(){
+      const $btn = $(this);
+      const originalText = $btn.text();
+      $btn.prop('disabled', true).text('Suggesting...');
+      let r = null;
+      try{
+        if(window.App && window.App.LLM){
+          r = await window.App.LLM.recommend(State.pantry, State.country);
+        }
+      }catch(e){ /* ignore and fallback */ }
+      // Safeguard: if LLM choice is worse than heuristic best by score, use the better match
+      const best = suggestRecipeByCountry();
+      if(!r){
+        r = best;
+      } else if(best){
+        const rScore = window.App.Utils.scoreRecipe(r, State.pantry).score;
+        const bScore = window.App.Utils.scoreRecipe(best, State.pantry).score;
+        if(bScore > rScore){ r = best; }
+      }
       if(r){
         State.currentRecipe = r;
         save();
@@ -227,6 +248,7 @@
       } else {
         $els.recipeCard.html('<div class="text-[#64748B]">No recipes for selected country.</div>');
       }
+      $btn.prop('disabled', false).text(originalText);
     });
 
     $els.naija.on('click', function(){
@@ -291,6 +313,31 @@
     cacheDom();
     load();
     bind();
+
+    // Preload AI model on app open and reflect progress in UI
+    try{
+      if(window.App.LLM){
+        window.App.LLM.onProgress(function(info){
+          if(!$els.llmBanner || $els.llmBanner.length === 0) return;
+          const pct = Math.max(0, Math.min(100, Math.round(((info && typeof info.progress === 'number') ? info.progress : 0) * 100)));
+          const downloading = !!(info && info.downloading);
+          if(downloading && pct < 100){
+            $els.llmBanner.removeClass('hidden');
+            $els.llmText.text(info && info.text ? info.text : 'Downloading model…');
+            $els.llmPct.text(pct + '%');
+            $els.llmBar.css('width', pct + '%');
+          } else {
+            setTimeout(function(){ $els.llmBanner.addClass('hidden'); }, 150);
+          }
+        });
+        // Kick off preload; the banner will appear only during actual network download
+        if(!window.App.LLM.isReady()){
+          setTimeout(function(){ window.App.LLM.ensure(); }, 0);
+        }
+      }
+    }catch(e){
+      // ignore
+    }
   };
 
   window.App.render = function(){

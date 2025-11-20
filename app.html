@@ -37,6 +37,18 @@
     </div>
   </header>
 
+  <!-- AI model loading banner -->
+  <div id="llm-loading" class="hidden fixed bottom-4 left-1/2 -translate-x-1/2 w-[92%] sm:w-[480px] bg-white/90 backdrop-blur rounded-xl ring-1 ring-black/5 shadow-lg p-4 z-50" role="status" aria-live="polite">
+    <div class="flex items-center justify-between">
+      <div class="text-sm font-semibold text-[#0F172A]">Preparing AI model</div>
+      <div id="llm-loading-pct" class="text-xs text-[#64748B]">0%</div>
+    </div>
+    <div class="mt-2 h-2 bg-gray-200 rounded-full overflow-hidden">
+      <div id="llm-loading-bar" class="h-full bg-[#0E9386] w-0 transition-all"></div>
+    </div>
+    <div id="llm-loading-text" class="mt-2 text-xs text-[#64748B]">Downloading model…</div>
+  </div>
+
   <main class="mx-auto max-w-7xl px-6 py-8">
     <div class="grid gap-6 lg:grid-cols-3">
       <!-- Left: Pantry and Controls -->
@@ -109,6 +121,7 @@
   <footer class="py-10 text-center text-sm text-[#64748B]">Built for home cooks. Happy cooking.</footer>
 
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="scripts/llm.js"></script>
   <script src="scripts/helpers.js"></script>
   <script src="scripts/ui.js"></script>
   <script src="scripts/main.js"></script>
