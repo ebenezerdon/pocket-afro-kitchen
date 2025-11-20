@@ -125,43 +125,49 @@
       const ok = await this.ensure();
       if(!ok || !this.engine) return null;
       try{
-        const pool = (window.App && window.App.Data && Array.isArray(window.App.Data.recipes)) ? window.App.Data.recipes : [];
-        const recs = pool.filter(r => !country || r.country === country);
-        if(recs.length === 0) return null;
-
-        const options = recs.map(r => {
-          const ings = (r.ingredients || []).map(i => i.item).join(', ');
-          return `${r.id} | ${r.name} | ingredients: ${ings}`;
-        }).join('\n');
-
-        const sys = 'You are an African cooking assistant. Choose the single best recipe id from the given options that fits the pantry. Prefer the specified country. Only output a compact JSON object like {"id":"<recipe-id>"} with an id that exactly matches one from the options. Do not add any explanation.';
-        const user = `Country: ${country}\nPantry: ${(pantry||[]).join(', ') || '(none)'}\nOptions (id | name | ingredients):\n${options}\nReturn JSON only.`;
+        const sys = 'You are an African cooking assistant. Given a pantry and an optional country, propose ONE recipe that best fits the pantry and is culturally authentic to the specified country. Output only JSON with fields: name (string), country (string), baseServings (number), ingredients (array of {item (string), qty (number|string), unit (string)}), steps (array of strings). Keep ingredient items in simple common names. No extra text.';
+        const user = `Country: ${country || 'any'}\nPantry: ${(pantry||[]).join(', ') || '(none)'}\nReturn JSON only, no markdown.`;
         const messages = [
           { role: 'system', content: sys },
           { role: 'user', content: user }
         ];
-
         const resp = await this.engine.chat.completions.create({
           messages,
-          temperature: 0.1,
-          max_tokens: 64
+          temperature: 0.3,
+          max_tokens: 256
         });
-        const text = (resp && resp.choices && resp.choices[0] && resp.choices[0].message && resp.choices[0].message.content) ? resp.choices[0].message.content : '';
-
-        let id = null;
-        try{ const j = JSON.parse(text); if(j && typeof j.id === 'string') id = j.id.trim(); }catch(_){
-          const m = String(text).match(/"id"\s*:\s*"([^"]+)"/); if(m) id = m[1];
+        const raw = (resp && resp.choices && resp.choices[0] && resp.choices[0].message && resp.choices[0].message.content) ? resp.choices[0].message.content : '';
+        const text = String(raw || '');
+        function extractJSON(s){
+          try{ return JSON.parse(s); }catch(_){ }
+          const m = s.match(/\{[\s\S]*\}/);
+          if(m){ try{ return JSON.parse(m[0]); }catch(_){ }
+          }
+          return null;
         }
-        if(!id){
-          const tokens = String(text).replace(/[{}"\[\]]/g,' ').split(/\s+/).filter(Boolean);
-          const ids = new Set(recs.map(r=>r.id));
-          const found = tokens.find(t => ids.has(t));
-          if(found) id = found;
+        function slugify(s){
+          return String(s || '').toLowerCase().replace(/[^a-z0-9\s-]/g,'').trim().replace(/\s+/g,'-').slice(0,48);
         }
-        if(!id) return null;
-        return pool.find(r => r.id === id) || null;
+        const j = extractJSON(text);
+        if(!j || !j.name || !Array.isArray(j.ingredients) || !Array.isArray(j.steps)) return null;
+        const recipe = {
+          id: 'llm-' + (slugify(j.name) || 'recipe'),
+          name: String(j.name).trim(),
+          country: String(j.country || country || '').trim() || (country || 'Nigeria'),
+          baseServings: Number(j.baseServings) > 0 ? Number(j.baseServings) : 4,
+          ingredients: (j.ingredients || []).map(it => {
+            if(!it) return { item:'', qty:'', unit:'' };
+            const item = (typeof it === 'string') ? it : it.item;
+            let qty = (typeof it === 'string') ? '' : (typeof it.qty === 'number' ? it.qty : (it.qty || ''));
+            let unit = (typeof it === 'string') ? '' : (it.unit || '');
+            return { item: String(item || '').trim(), qty, unit: String(unit || '').trim() };
+          }).filter(i => i.item),
+          steps: (j.steps || []).map(s => String(s).trim()).filter(Boolean)
+        };
+        if(recipe.ingredients.length === 0 || recipe.steps.length === 0) return null;
+        return recipe;
       }catch(e){
-        console.warn('WebLLM recommend error', e);
+        console.warn('WebLLM generate error', e);
         return null;
       }
     }

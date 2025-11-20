@@ -232,16 +232,14 @@
           r = await window.App.LLM.recommend(State.pantry, State.country);
         }
       }catch(e){ /* ignore and fallback */ }
-      // Safeguard: if LLM choice is worse than heuristic best by score, use the better match
       const best = suggestRecipeByCountry();
       if(!r){
         r = best;
-      } else if(best){
-        const rScore = window.App.Utils.scoreRecipe(r, State.pantry).score;
-        const bScore = window.App.Utils.scoreRecipe(best, State.pantry).score;
-        if(bScore > rScore){ r = best; }
       }
       if(r){
+
+        if(!r.country) r.country = State.country;
+        if(!r.baseServings || Number(r.baseServings) <= 0) r.baseServings = 4;
         State.currentRecipe = r;
         save();
         renderRecipe();
