@@ -1,0 +1,53 @@
+:root{
+  --brand-teal:#0E9386;
+  --brand-teal-dark:#0C8277;
+  --mint:#A1E7DF;
+  --brand-orange:#FF6A3D;
+  --brand-orange-dark:#E85F36;
+  --ink:#0F172A;
+  --paper:#FAFCFB;
+}
+
+/* Global typography */
+body{font-feature-settings:"liga" 1, "kern" 1;}
+h1,h2,h3,h4,h5{font-family:'Work Sans', sans-serif;}
+
+/* Hero blobs for landing page */
+.hero-blob{position:absolute;border-radius:32px;filter:blur(20px);opacity:.25;animation:floaty 14s ease-in-out infinite;}
+.hero-blob--teal{background:var(--brand-teal);width:420px;height:420px;left:-120px;top:-80px;}
+.hero-blob--peach{background:var(--brand-orange);width:300px;height:300px;right:60px;top:30px;animation-delay:2s;}
+.hero-blob--mint{background:var(--mint);width:260px;height:260px;right:-100px;bottom:-60px;animation-delay:4s;}
+
+@keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(16px)}}
+
+/* Micro interaction animations */
+.btn-primary,.btn-secondary,.btn-ghost{transition:transform .25s ease, box-shadow .25s ease;}
+.btn-primary:hover{transform:translateY(-1px);} 
+.btn-secondary:hover{transform:translateY(-1px);} 
+.btn-ghost:hover{transform:translateY(-1px);} 
+
+/* Cards smooth reveal */
+.card,.card-soft{animation:fadeInUp .5s ease both;}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* Recipe and list styling */
+.recipe-title{font-family:'Work Sans', sans-serif;font-weight:800;}
+.recipe-steps li{margin-bottom:.5rem;}
+.ingredient-item{display:flex;align-items:center;justify-content:space-between;gap:.5rem;padding:.5rem .75rem;border-radius:.75rem;border:1px solid rgba(0,0,0,.05);background:#fff;}
+.ingredient-item .qty{color:#475569;font-weight:600;}
+
+/* Shopping list */
+.shopping-item{display:flex;align-items:center;gap:.75rem;padding:.6rem .75rem;border-radius:.75rem;border:1px solid rgba(0,0,0,.06);background:#fff;}
+.shopping-item input[type="checkbox"]{width:1.05rem;height:1.05rem;}
+.shopping-item.purchased{opacity:.6;text-decoration:line-through;}
+
+/* Accessibility focus */
+:focus-visible{outline:2px solid var(--mint);outline-offset:2px}
+
+/* Ensure buttons are never overlapped */
+header, nav, .btn-primary, .btn-secondary, .btn-ghost { position: relative; z-index: 20; }
+
+/* Prevent text overlap on small screens */
+@media (max-width: 380px){
+  .btn-primary, .btn-secondary, .btn-ghost{min-width:unset;padding-left:14px;padding-right:14px;font-size:.95rem}
+}
